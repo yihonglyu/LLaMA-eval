@@ -1,0 +1,43 @@
+Export LLaMA PyTorch to ONNX (~120GB memory):
+
+$ optimum-cli export onnx --model decapoda-research/llama-7b-hf --task causal-lm-with-past --for-ort --device cpu <path to onnx dir>
+
+
+Verify the exported LLaMA ONNX (~90GB memory):
+
+$ python verify_llama_7b_onnx.py
+
+
+Benchmark the LLaMA PyTorch (~40GB memory):
+
+$ python llama_7b_pt.py
+
+
+Benchmark the LLaMA ONNX (~60GB memory):
+
+1. Update model_path to your <path to onnx dir>
+
+2. $ python llama_7b_onnx.py
+
+
+Optimize the LLaMA ONNX with onnxruntime.transformers.optimizer:
+
+1. $ python -m onnxruntime.transformers.optimizer --input <path to onnx dir>/decoder_model.onnx --output <path to optimized onnx dir>/decoder_model.onnx --num_heads 32 --hidden_size 4096 --model_type gpt2 --use_external_data_format
+
+2. $ python -m onnxruntime.transformers.optimizer --input <path to onnx dir>/decoder_with_past_model.onnx --output <path to optimized onnx dir>/decoder_with_past_model.onnx --num_heads 32 --hidden_size 4096 --model_type gpt2 --use_external_data_format
+
+3. Copy <path to onnx dir> to <path to optimized onnx dir> except:
+     - decoder_model.onnx
+     - decoder_model.onnx_data
+     - decoder_model_merged.onnx
+     - decoder_model_merged.onnx_data
+     - decoder_with_past_model.onnx
+     - decoder_with_past_model.onnx_data
+
+4. Make sure <path to optimized onnx dir> has below:
+     - decoder_model.onnx
+     - decoder_model.onnx.data
+     - decoder_with_past_model.onnx
+     - decoder_with_past_model.onnx.data
+
+PS. onnxruntime.transformers.optimizer has issue to optimize decoder_model_merged.onnx
