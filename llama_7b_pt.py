@@ -39,7 +39,6 @@ for prompt_length in prompt_lengths:
 
         gc.collect()
         gc.disable()
-        #prev_gen_tokens = None
         start = time.time()
         for i in range(n_batch):
             gen_tokens = model.generate(
@@ -47,10 +46,6 @@ for prompt_length in prompt_lengths:
                 min_length=gen_tokens_length,
                 max_length=gen_tokens_length
             )
-
-            #if prev_gen_tokens is not None:
-            #    assert torch.equal(prev_gen_tokens, gen_tokens)
-            #prev_gen_tokens = gen_tokens
         end = time.time()
         gc.enable()
         print(f"PT: {(end - start) / n_batch:.3f} s")

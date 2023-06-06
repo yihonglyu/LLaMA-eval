@@ -1,13 +1,12 @@
 import gc
 import time
-import torch
 from transformers import LlamaTokenizer
 from optimum.onnxruntime import ORTModelForCausalLM
 
 n_batch = 10
 
 tokenizer_path = "decapoda-research/llama-7b-hf"
-model_path = "/home/yilyu/LLaMA/llama-7b-onnx"
+model_path = "/home/yilyu/LLaMA/llama-7b-onnx-opt-nomerged"
 
 print(f"Excuting LLaMA models under {model_path}")
 
@@ -15,7 +14,10 @@ prompt_lengths = [ 64, 128, 256, 512, 1024 ]
 new_token_lengths= [ 1, 129 ]
 
 tokenizer = LlamaTokenizer.from_pretrained(tokenizer_path)
-model = ORTModelForCausalLM.from_pretrained(model_path)
+model = ORTModelForCausalLM.from_pretrained(
+    model_path,
+    use_io_binding = True,
+)
 
 for prompt_length in prompt_lengths:
     for new_token_length in new_token_lengths:
@@ -41,7 +43,6 @@ for prompt_length in prompt_lengths:
 
         gc.collect()
         gc.disable()
-        #prev_gen_tokens = None
         start = time.time()
         for i in range(n_batch):
             gen_tokens = model.generate(
@@ -49,10 +50,6 @@ for prompt_length in prompt_lengths:
                 min_length=gen_tokens_length,
                 max_length=gen_tokens_length
             )
-
-            #if prev_gen_tokens is not None:
-            #    assert torch.equal(prev_gen_tokens, gen_tokens)
-            #prev_gen_tokens = gen_tokens
         end = time.time()
         gc.enable()
         print(f"ORT: {(end - start) / n_batch:.3f} s")

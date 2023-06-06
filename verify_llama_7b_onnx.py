@@ -6,7 +6,7 @@ from optimum.onnxruntime import ORTModelForCausalLM
 
 tokenizer_path = "decapoda-research/llama-7b-hf"
 pt_model_path = "decapoda-research/llama-7b-hf"
-ort_model_path = "/home/yilyu/LLaMA/llama-7b-onnx"
+ort_model_path = "/home/yilyu/LLaMA/llama-7b-onnx-opt-nomerged"
 
 print(f"Excuting LLaMA PyTorch models under {pt_model_path}")
 print(f"Excuting LLaMA ONNX models under {ort_model_path}")
@@ -19,7 +19,10 @@ new_token_lengths= [ 1, 129 ]
 pt_tokenizer = LlamaTokenizer.from_pretrained(tokenizer_path)
 pt_model = LlamaForCausalLM.from_pretrained(pt_model_path)
 ort_tokenizer = LlamaTokenizer.from_pretrained(tokenizer_path)
-ort_model = ORTModelForCausalLM.from_pretrained(ort_model_path)
+ort_model = ORTModelForCausalLM.from_pretrained(
+    ort_model_path,
+    use_io_binding = True,
+)
 
 for prompt_length in prompt_lengths:
     for new_token_length in new_token_lengths:
