@@ -41,3 +41,11 @@ Optimize the LLaMA ONNX with onnxruntime.transformers.optimizer:
      - decoder_with_past_model.onnx.data
 
 PS. onnxruntime.transformers.optimizer has issue to optimize decoder_model_merged.onnx
+
+
+Evaluation of LLaMA ONNX model:
+
+* Per token cost = ORT(for prompt_lengths = 129) - ORT(for prompt_lengths =  1) / (129 - 1)
+* Prompt cost = ORT(for prompt_lengths = 1) - Per token cost
+
+PS. LLaMA PyTorch has the same metric
